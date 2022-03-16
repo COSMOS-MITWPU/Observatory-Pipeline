@@ -14,6 +14,13 @@ from astroplan.plots import plot_finder_image
 from astroquery.skyview import SkyView
 import matplotlib.pyplot as plt
 from astroplan.plots import plot_sky, plot_airmass
+from astropy.table import QTable
+from astropy.io import ascii
+from astropy.table import Table
+import astropy.units as u
+import numpy as np
+import pandas as pd
+
 download_IERS_A()
 now = Time.now()
 
@@ -151,6 +158,54 @@ def x_degree_horizon(observer, target, degree):
     ).iso
     return time
 
+def rise_time(observer,target):
+    time=observer.target_rise_time(now,target).iso
+    return time
+
+def set_time(observer,target):
+    time=observer.target_set_time(now,target).iso
+    return time
 
 # print(x_degree_horizon(observatory_setup(),FixedTarget.from_name('m51'),30))
 
+cel_body=input("Enter the Celestial Body:")
+
+
+target_names=['vega','polaris','m1','m42','m55']
+target_names.append(cel_body)
+targets=[FixedTarget.from_name(x) for x in target_names]
+
+ra=[]
+dec=[]
+rise_times=[]
+set_times=[]
+visibility=[]
+for target in targets:
+    ra.append(target.ra.degree)
+    dec.append(target.dec.degree)
+    
+for i in targets:
+    rise_times.append(rise_time(observatory_setup(),i))
+
+for i in targets:
+    set_times.append(set_time(observatory_setup(),i))
+
+for i in targets:
+    visibility.append(target_is_up(observatory_setup(),i,midnight()))
+
+names=np.array(target_names)
+a=np.array(ra)
+b=np.array(dec)
+c=np.array(rise_times)
+d=np.array(set_times)
+
+t=QTable([names,a,b,c,d],names=('TARGET','RA','DEC','RISE TIME','SET TIME'))
+
+df=pd.DataFrame([names,a,b,c,d],index=['TARGET','RA','DEC','RISE TIME','SET TIME'])
+
+df.to_excel("values.xlsx")
+
+t.pprint()
+print(visibility)
+
+# print(rise_time(observatory_setup(),FixedTarget.from_name('m55')))
