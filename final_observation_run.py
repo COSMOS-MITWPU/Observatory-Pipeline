@@ -170,6 +170,22 @@ def set_time(observer,target):
     return time
 
 
+def if_observable(observer, target, t_start, t_end):
+    constraints = [AltitudeConstraint(15*u.deg, 84*u.deg),
+               AirmassConstraint(3), AtNightConstraint.twilight_civil(), MoonSeparationConstraint(min = 10 * u.deg)]
+    t_range = Time([t_start - 0.5 * u.hour, t_end + 0.5 * u.hour])
+    ever_observable = is_observable(constraints, observer, target, time_range=t_range)
+    return ever_observable
+    
+def transit(observer, target):
+    return (rise_time(observer, target) - set_time(observer, target)).to(u.hr)
+    # or
+    # rise_time = observer.target_rise_time(obs_time, targets[-1], which = 'nearest', horizon=0*u.deg)
+    # set_time = observer.target_set_time(obs_time, targets[-1], which = 'next', horizon=0*u.deg)
+    # transit_time = observer.astropy_time_to_datetime(rise_time) - observer.astropy_time_to_datetime(set_time)
+
+
+
 # print(x_degree_horizon(observatory_setup(),FixedTarget.from_name('m51'),30))
 
 
