@@ -36,6 +36,7 @@ def observatory_setup():
     elevation = 560 * u.m
     location = EarthLocation(longitude, latitude, elevation)
 
+
     ioMIT = Observer(
         location=location,
         timezone="Asia/Kolkata",
@@ -158,21 +159,21 @@ def x_degree_horizon(observer, target, degree):
     ).iso
     return time
 
+
 def rise_time(observer,target):
     time=observer.target_rise_time(now,target).iso
     return time
+
 
 def set_time(observer,target):
     time=observer.target_set_time(now,target).iso
     return time
 
-# print(x_degree_horizon(observatory_setup(),FixedTarget.from_name('m51'),30))
 
-cel_body=input("Enter the Celestial Body:")
+# print(x_degree_horizon(observatory_setup(),FixedTarget.from_name('m51'),30))
 
 
 target_names=['vega','polaris','m1','m42','m55']
-target_names.append(cel_body)
 targets=[FixedTarget.from_name(x) for x in target_names]
 
 ra=[]
@@ -201,7 +202,9 @@ d=np.array(set_times)
 
 t=QTable([names,a,b,c,d],names=('TARGET','RA','DEC','RISE TIME','SET TIME'))
 
-df=pd.DataFrame([names,a,b,c,d],index=['TARGET','RA','DEC','RISE TIME','SET TIME'])
+df=pd.DataFrame([names,a,b,c,d],index=['OBJECT','RA','DEC','RISE TIME','SET TIME'])
+
+df=df.transpose()
 
 df.to_excel("values.xlsx")
 
