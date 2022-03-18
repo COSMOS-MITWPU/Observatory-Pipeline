@@ -6,6 +6,7 @@ from astropy.coordinates import EarthLocation
 import pytz
 from astroplan import Observer, FixedTarget
 from astropy.utils.iers import conf
+
 conf.auto_max_age = None
 from astroplan import download_IERS_A
 from astropy.coordinates import get_sun, get_moon, get_body
@@ -35,7 +36,6 @@ def observatory_setup():
     latitude = "18d31m7s"
     elevation = 560 * u.m
     location = EarthLocation(longitude, latitude, elevation)
-
 
     ioMIT = Observer(
         location=location,
@@ -160,51 +160,53 @@ def x_degree_horizon(observer, target, degree):
     return time
 
 
-def rise_time(observer,target):
-    time=observer.target_rise_time(now,target).iso
+def rise_time(observer, target):
+    time = observer.target_rise_time(now, target).iso
     return time
 
 
-def set_time(observer,target):
-    time=observer.target_set_time(now,target).iso
+def set_time(observer, target):
+    time = observer.target_set_time(now, target).iso
     return time
 
 
 # print(x_degree_horizon(observatory_setup(),FixedTarget.from_name('m51'),30))
 
 
-target_names=['vega','polaris','m1','m42','m55']
-targets=[FixedTarget.from_name(x) for x in target_names]
+target_names = ["vega", "polaris", "m1", "m42", "m55"]
+targets = [FixedTarget.from_name(x) for x in target_names]
 
-ra=[]
-dec=[]
-rise_times=[]
-set_times=[]
-visibility=[]
+ra = []
+dec = []
+rise_times = []
+set_times = []
+visibility = []
 for target in targets:
     ra.append(target.ra.degree)
     dec.append(target.dec.degree)
-    
-for i in targets:
-    rise_times.append(rise_time(observatory_setup(),i))
 
 for i in targets:
-    set_times.append(set_time(observatory_setup(),i))
+    rise_times.append(rise_time(observatory_setup(), i))
 
 for i in targets:
-    visibility.append(target_is_up(observatory_setup(),i,midnight()))
+    set_times.append(set_time(observatory_setup(), i))
 
-names=np.array(target_names)
-a=np.array(ra)
-b=np.array(dec)
-c=np.array(rise_times)
-d=np.array(set_times)
+for i in targets:
+    visibility.append(target_is_up(observatory_setup(), i, midnight()))
 
-t=QTable([names,a,b,c,d],names=('TARGET','RA','DEC','RISE TIME','SET TIME'))
+names = np.array(target_names)
+a = np.array(ra)
+b = np.array(dec)
+c = np.array(rise_times)
+d = np.array(set_times)
 
-df=pd.DataFrame([names,a,b,c,d],index=['OBJECT','RA','DEC','RISE TIME','SET TIME'])
+t = QTable([names, a, b, c, d], names=("TARGET", "RA", "DEC", "RISE TIME", "SET TIME"))
 
-df=df.transpose()
+df = pd.DataFrame(
+    [names, a, b, c, d], index=["OBJECT", "RA", "DEC", "RISE TIME", "SET TIME"]
+)
+
+df = df.transpose()
 
 df.to_excel("values.xlsx")
 
@@ -212,3 +214,4 @@ t.pprint()
 print(visibility)
 
 # print(rise_time(observatory_setup(),FixedTarget.from_name('m55')))
+# added a new comment
