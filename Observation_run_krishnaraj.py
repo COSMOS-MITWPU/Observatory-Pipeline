@@ -130,13 +130,13 @@ target_names=['vega','polaris','m1','m42','m55']
 
 
 def main():
-    print("What is the Date and time that you would like to make observations on? (Enter 0 for now, or enter full date)")
+    print("What is the Date and time that you would like to make observations on? (Enter 0 for now, or enter full date (YYYY-MM-DD HH:MM:SS.sss))")
 
     obs_time = input()
     if obs_time == '0':
         obs_time = Time.now()
     else: 
-        obs_time = Time(obs_time)
+        obs_time = Time(obs_time,format='iso')
         
     print("Enter the location of the observatory (0 for MIT Observatory, LAT and LON for Others)")
 
