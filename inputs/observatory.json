@@ -1,0 +1,8 @@
+{
+    "name":"MIT-Telescope",
+    "description": "GSO-Newtonian Telescope MIT World Peace University",
+    "latitude": "73d48m53s",
+    "longitude":"18d31m7s",
+    "elevation":560,
+    "timezone":"Asia/Kolkata"
+}
