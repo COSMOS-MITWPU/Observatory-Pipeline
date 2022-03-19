@@ -1,6 +1,6 @@
 # Linux-Basic-Commands
 <p align="center">
-<img src="linux.png" height="151">
+<img src="./images/linux.png" height="151">
 </p>
 
 
