@@ -72,3 +72,5 @@ def constraints_setup():
         print("The File you provided doesnt exist. Please Check and Enter again")
 
     return data
+
+date_and_time_setup("./inputs/date_and_time.json")
