@@ -52,7 +52,18 @@ def date_and_time_setup(file_path):
     # return a list of the important dates and times like day and time of observation
     # or return a single astropy date object without formatitng.
     # or return a datetime_object
+    file = json.load(open(file_path))
 
+    day = file["day"]
+    month = file["month"]
+    year = file["year"]
+    hours = file["hours"]
+    minutes = file["minutes"]
+    seconds = file["seconds"]
+
+    return_array = [day, month, year, hours, minutes, seconds]
+    # print(return_array)
+    return (return_array)
     pass
 
 
@@ -73,4 +84,5 @@ def constraints_setup():
 
     return data
 
-date_and_time_setup("./inputs/date_and_time.json")
+date_and_time_path = "./inputs/date_and_time.json" 
+date_and_time_setup(date_and_time_path)
