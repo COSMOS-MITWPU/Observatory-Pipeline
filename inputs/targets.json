@@ -1,3 +1,18 @@
 {
-    "targets": ["vega", "m31", "polaris", "m1", "m42", "m55"]
+    "targets": ["vega", 
+                "m31",
+                "jupiter",
+                "m1",
+                "m42",
+                "m55",
+                "saturn",
+                "sun",
+                "neptune",
+                "moon",
+                "venus",
+                "mars",
+                "orion",
+                "betelgeuse",
+                "rigel"
+            ]
 }

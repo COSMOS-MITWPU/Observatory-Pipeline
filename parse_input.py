@@ -8,7 +8,11 @@ from astropy.time import Time
 import astropy.units as units
 import pandas as pd
 from datetime import datetime
-
+from astroplan import (AltitudeConstraint, AirmassConstraint,
+                       AtNightConstraint, MoonSeparationConstraint)
+from astroplan import is_observable, is_always_observable, months_observable
+from astropy.coordinates import solar_system_ephemeris, EarthLocation
+from astropy.coordinates import get_body_barycentric, get_body, get_moon
 
 def if_observable(observer, target, constraints):
     """
@@ -25,15 +29,15 @@ def if_observable(observer, target, constraints):
     """
     
     
-    constraints_list = [AltitudeConstraint(constraints['minimum_altitude']*u.deg, constraints['maximum_altitude']*u.deg),
+    constraints_list = [AltitudeConstraint(constraints['minimum_altitude']*units.deg, constraints['maximum_altitude']*units.deg),
                     AirmassConstraint(constraints['airmass']),
                     AtNightConstraint.twilight_civil(), 
-                    MoonSeparationConstraint(min = constraints['moon_separation'] * u.deg)
+                    MoonSeparationConstraint(min = constraints['moon_separation'] * units.deg)
                ]
     
-    t_range = Time([constraints['start_time'] - 0.5 * u.hour, constraints['end_time'] + 0.5 * u.hour])
+    t_range = Time([constraints['start_time'] - 0.5 * units.hour, constraints['end_time'] + 0.5 * units.hour])
     ever_observable = is_observable(constraints_list, observer, target, time_range=t_range)
-    return ever_observable
+    return ever_observable[0] # return the first element of the list
 
 def transit(observer, target):
     """
@@ -79,8 +83,8 @@ def observatory_setup(file_path):
 
     # Calculating and Returning the object.
 
-    location = EarthLocation(
-        data["longitude"], data["latitude"], data["elevation"] * units.m
+    location = EarthLocation.from_geodetic(
+        data["longitude"] * units.deg, data["latitude"] * units.deg, data["elevation"] * units.m
     )
 
     ioMIT = Observer(
@@ -111,6 +115,10 @@ def date_and_time_setup(file_path):
     # return an astropy Time object from the input data_time.json file. 
     # so that other functions can directly use it. 
     date_data = json.load(open(file_path))
+    
+    if date_data['use_current_time'] is True:
+        return Time.now()
+    
     astropy_time = json_to_astropy_time(date_data)
     return astropy_time
 
@@ -135,19 +143,33 @@ def targets_setup(file_path, observer, constraints, obs_time):
 
 
     # Defining the DataBase
-    target_info_df = pd.DataFrame(columns = ['TARGET','RA','DEC','RISE TIME','SET TIME', 'TRANSIT', 'OBSERVABLE DURING TRANSIT?'])
+    target_info_df = pd.DataFrame(columns = ['TARGET','RA','DEC','RISE TIME','SET TIME', 'TRANSIT (Hours)', 'OBSERVABLE DURING TRANSIT?'])
 
 
     for i, target in enumerate(targets_list):
-        initialized_target = FixedTarget.from_name(target)
-
-        rise_time = observer.target_rise_time(obs_time, initialized_target, which = 'nearest', horizon=0*units.deg)
-        set_time = observer.target_set_time(obs_time, initialized_target, which = 'next', horizon=0*units.deg)
-        transit_time = 0 # made 0 duo to an error
-        # observer.astropy_time_to_datetime(rise_time) - observer.astropy_time_to_datetime(set_time)
-
-        observable = 0 # made 0 duo to an error
-        # if_observable(observer, initialized_target, constraints)
+        
+        try : 
+            initialized_target = FixedTarget.from_name(target)
+            rise_time = observer.target_rise_time(obs_time, initialized_target, which = 'nearest', horizon=0*units.deg)
+            set_time = observer.target_set_time(obs_time, initialized_target, which = 'next', horizon=0*units.deg)
+            transit_time = round((set_time - rise_time).to(units.hr).value, 2)
+        except TypeError as err:
+            print('There was an error while finding the transit time of', target)
+            transit_time = 0
+        except:
+            print("cant find the target in the database: ", target)
+            print("looking for it in the Solar Database")
+            try: 
+                with solar_system_ephemeris.set('builtin'):
+                    initialized_target = get_body(target, obs_time, observer.location) 
+                    rise_time = observer.target_rise_time(obs_time, initialized_target, which = 'nearest', horizon=0*units.deg)
+                    set_time = observer.target_set_time(obs_time, initialized_target, which = 'next', horizon=0*units.deg)
+                    transit_time = round((set_time - rise_time).to(units.hr).value, 2)
+                    print("found in solar database")
+            except:
+                print("not found in solar database either. Skipping")
+                continue
+        observable = if_observable(observer, initialized_target, constraints)
         
         
         # Adding a row to the database with calculated values. 

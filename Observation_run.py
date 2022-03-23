@@ -23,6 +23,9 @@ from astropy.coordinates import get_sun, get_moon, get_body
 from astroplan import moon_illumination# made 0 duo to an error
 import parse_input as pi
 import os
+from astroplan import (AltitudeConstraint, AirmassConstraint,
+                       AtNightConstraint, MoonSeparationConstraint)
+from astroplan import is_observable, is_always_observable, months_observable
 
 conf.auto_max_age = None
 
@@ -98,10 +101,6 @@ def observer_info(observer, obs_time):
     observer_info.loc[4] = ['Next Sunrise Time', sunrise_ioMIT.iso]
 
     return observer_info
-
-# only examples
-target_names=['vega','polaris','m1','m42','m55']
-
 
 def main():
     
