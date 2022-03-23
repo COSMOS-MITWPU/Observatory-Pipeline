@@ -4,7 +4,7 @@
 # to write all the pre requisite information like the observatory location, targets, constraints etc in
 # the inputs files given in the ./inputs folder json files. The parse_input files then parses it.
 # this file will take functions from parse_input and use its outputs here. 
-
+ 
 # Important Libraries. 
 
 import numpy as np
@@ -140,6 +140,7 @@ def main():
     ### INPUT BASIC INFO ### 
     
     print("What is the Date and time that you would like to make observations on? (Enter 0 for now, or enter full date)")
+    # pi.date_and_time_setup()
 
     obs_time = input()
     if obs_time == '0':
@@ -209,47 +210,8 @@ def main():
     }
     
     
-    # Defining the DataBase
-    target_info_df = pd.DataFrame(columns = ['TARGET','RA','DEC','RISE TIME','SET TIME', 'TRANSIT', 'OBSERVABLE DURING TRANSIT?'])
 
-    ### INPUT TARGETS ###
-
-
-    print("\n\nEnter target Name(s): (Enter 0 when done)")
-
-    database_index = 0
-    targets = [] # Empty list to hold Target objects of the target class
-    target = input() # Take in the first target
-    # Taking in multiple targets and simultaineously adding them as rows in the database. 
-    while(target != "0"):
-
-        try:
-            
-            # calculate the output variables
-            targets.append(FixedTarget.from_name(target))       
-            rise_time = observer.target_rise_time(obs_time, targets[-1], which = 'nearest', horizon=0*u.deg)
-            set_time = observer.target_set_time(obs_time, targets[-1], which = 'next', horizon=0*u.deg)
-            transit_time = 0 # made 0 duo to an error
-            # observer.astropy_time_to_datetime(rise_time) - observer.astropy_time_to_datetime(set_time)
-            observable = 0 # made 0 duo to an error
-            # if_observable(observer, targets[-1], eve_twil_ioMIT, morn_twil_ioMIT)
-            
-            
-            # Adding a row to the database with calculated values. 
-            target_info_df.loc[database_index] = [target, # Name
-                                        targets[-1].ra.degree, # RA 
-                                        targets[-1].dec.degree,  # DEC
-                                        rise_time.iso, # Rise time
-                                        set_time.iso, # Set time
-                                        transit_time, # Transit
-                                        observable # Whether or not the object is observable
-                                        ]
-            database_index += 1
-        except:
-            print("Either the object you searched doesnt exist in our database(which isnt even complete or ready\
-                or there is some other error that we havent fixed yet and are working on it. ")
-
-        target = input()
+    target_info_df = pi.targets_setup("./inputs/targets.json")
         
     # os.path is being used so as to maintain consistancy between OSX and Windows devices. 
     target_info_df.to_csv(os.path.join(os.getcwd(), 'outputs/targets_info.csv'))
