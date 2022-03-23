@@ -48,14 +48,10 @@ def observatory_setup(file_path):
     return ioMIT
 
 
-<<<<<<< HEAD
-def date_and_time_setup():
-=======
 def date_and_time_setup(file_path):
     # return a list of the important dates and times like day and time of observation
     # or return a single astropy date object without formatitng.
     # or return a datetime_object
->>>>>>> bc73118a746fb450d980dc3107119e837de67d13
     file = json.load(open(file_path))
 
     day = file["day"]
@@ -70,12 +66,7 @@ def date_and_time_setup(file_path):
     return (return_array)
     pass
 
-<<<<<<< HEAD
 def targets_setup(file_path):
-=======
-
-def targets_setup():
->>>>>>> bc73118a746fb450d980dc3107119e837de67d13
     # return a list of Objects of the target class pre initialized.
     
 
