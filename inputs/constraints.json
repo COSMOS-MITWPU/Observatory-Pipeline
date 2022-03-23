@@ -1,8 +1,27 @@
 {
-    "airmass":3,
-    "minimum_altitude":15,
-    "maximum_altitude":85,
-    "moon_separation":10,
-    "start_time":0,
-    "end_time":0
+    "airmass": 3,
+    "minimum_altitude": 15,
+    "maximum_altitude": 85,
+    "moon_separation": 10,
+
+    "define_start_time":false,
+    "start_time":
+                {
+                    "day":20,
+                    "month":3,
+                    "year": 2022,
+                    "hours":20,
+                    "minutes":30,
+                    "seconds":29
+                },
+    "define_end_time":false,
+    "end_time":
+                {
+                    "day":20,
+                    "month":3,
+                    "year": 2022,
+                    "hours":20,
+                    "minutes":30,
+                    "seconds":29
+                }
 } 
