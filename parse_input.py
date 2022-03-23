@@ -1,5 +1,5 @@
 # File to parse the input file and return the data as python objects
-  
+
 import json
 import os
 from astropy.coordinates import EarthLocation
@@ -8,46 +8,54 @@ import astropy.units as units
 import pandas as pd
 
 # Opening JSON file
+# file_path=open("./inputs/observatory.json")
+
 
 def observatory_setup(file_path):
     """
     Parse input observatory.json file
-    
+
     Inputs:
         Absolute or relative path of the input json file containing
         information about the observatory
     Returns:
         an object of the Observer class from Astroplan
     """
-    
+
     # Getting the absolute path to avoid confusion
     file_path = os.path.abspath(file_path)
     observator_data = open(file_path)
-    
-    
+
     # Parsing the file
     try:
         data = json.load(observator_data)
     except FileNotFoundError as err:
         print("OBSERVATORY JSON FILE NOT FOUND")
         print("The File you provided doesnt exist. Please Check and Enter again")
-    
+
     # Calculating and Returning the object.
-    
-    location = EarthLocation(data['longitude'], 
-                             data['latitude'], 
-                             data['elevation'] * units.m)
-    
+
+    location = EarthLocation(
+        data["longitude"], data["latitude"], data["elevation"] * units.m
+    )
+
     ioMIT = Observer(
         location=location,
-        timezone=data['timezone'],
-        name=data['name'],
-        description=data['description'],
+        timezone=data["timezone"],
+        name=data["name"],
+        description=data["description"],
     )
     return ioMIT
 
 
+<<<<<<< HEAD
 def date_and_time_setup():
+=======
+def date_and_time_setup(file_path):
+    # return a list of the important dates and times like day and time of observation
+    # or return a single astropy date object without formatitng.
+    # or return a datetime_object
+>>>>>>> bc73118a746fb450d980dc3107119e837de67d13
     file = json.load(open(file_path))
 
     day = file["day"]
@@ -62,7 +70,12 @@ def date_and_time_setup():
     return (return_array)
     pass
 
+<<<<<<< HEAD
 def targets_setup(file_path):
+=======
+
+def targets_setup():
+>>>>>>> bc73118a746fb450d980dc3107119e837de67d13
     # return a list of Objects of the target class pre initialized.
     
 
@@ -106,6 +119,7 @@ def targets_setup(file_path):
     target_info_df.to_csv(os.path.join(os.getcwd(), 'outputs/targets_info.csv'))
     print("file saved. ")
 
+
 def constraints_setup():
     file_path = os.path.abspath(file_path)
     constraints_data = open(file_path)
@@ -121,3 +135,7 @@ def constraints_setup():
     
     pass
 
+    return data
+
+date_and_time_path = "./inputs/date_and_time.json" 
+date_and_time_setup(date_and_time_path)

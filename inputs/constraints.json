@@ -1,0 +1,8 @@
+{
+    "airmass":3,
+    "minimum_altitude":15,
+    "maximum_altitude":85,
+    "moon_separation":10,
+    "start_time":0,
+    "end_time":0
+} 
