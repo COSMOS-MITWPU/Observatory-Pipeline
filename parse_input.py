@@ -104,6 +104,8 @@ def observatory_setup(file_path):
 
     # Calculating and Returning the object.
 
+    data = data['observatory']
+
     location = EarthLocation.from_geodetic(
         data["longitude"] * units.deg,
         data["latitude"] * units.deg,
@@ -142,6 +144,8 @@ def date_and_time_setup(file_path):
     # so that other functions can directly use it.
     date_data = json.load(open(file_path))
 
+    date_data = date_data['date_and_time']
+
     if date_data["use_current_time"] is True:
         return Time.now()
 
@@ -163,6 +167,8 @@ def targets_setup(file_path, observer, constraints, obs_time):
     except FileNotFoundError as err:
         print("TARGETS JSON FILE NOT FOUND")
         print("The File you provided doesnt exist. Please Check and Enter again")
+
+    targets_data = targets_data['targets']
 
     targets_list = targets_data["targets"]
 
@@ -244,6 +250,8 @@ def constraints_setup(file_path):
     except FileNotFoundError as err:
         print("CONSTRAINTS JSON FILE NOT FOUND")
         print("The File you provided doesnt exist. Please Check and Enter again")
+
+    data = data['constraints']
 
     # if start time isnt defined, then well use the evening twilight time as default.
     if data["define_start_time"] is False:

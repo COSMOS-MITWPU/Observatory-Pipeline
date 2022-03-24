@@ -29,6 +29,8 @@ from astroplan import is_observable, is_always_observable, months_observable
 
 conf.auto_max_age = None
 
+input_file_path = "./inputs/input.json"
+
 # using UTI1
 download_IERS_A()
 
@@ -108,12 +110,12 @@ def main():
     """
     # defining the observation time by using the functions from parse_input.py
     # this defines the date and time of the observation, and is an Astropy Time object.
-    obs_time = pi.date_and_time_setup("./inputs/date_and_time.json")
+    obs_time = pi.date_and_time_setup(input_file_path)
         
     # Defining our observer using the function from parse_input file
     # other inputs also to be done like this, and therefore shift some above defined functions to 
     # the parse_input file. Thereby eliminating all required TUI from the user side.
-    observer = pi.observatory_setup("./inputs/observatory.json")
+    observer = pi.observatory_setup(input_file_path)
 
     # Getting Key Times, and saving them to an observer info file. 
     observer_info_db = observer_info(observer, obs_time) 
@@ -121,10 +123,10 @@ def main():
     print("Observer Info File Saved!")
     
     # Constraints is a dictionary containing all the constraints defind in constraints.json
-    constraints = pi.constraints_setup("./inputs/constraints.json")
+    constraints = pi.constraints_setup(input_file_path)
 
     # Create a dataframe that has information about the targets using input files. 
-    target_info_df = pi.targets_setup("./inputs/targets.json", observer, constraints, obs_time)
+    target_info_df = pi.targets_setup(input_file_path, observer, constraints, obs_time)
         
     # os.path is being used so as to maintain consistancy between OSX and Windows devices. 
     target_info_df.to_csv(os.path.join(os.getcwd(), 'outputs/targets_info.csv'))
