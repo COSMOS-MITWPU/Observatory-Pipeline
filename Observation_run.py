@@ -103,7 +103,9 @@ def observer_info(observer, obs_time):
     return observer_info
 
 def main():
-    
+    """
+    what does the main function do
+    """
     # defining the observation time by using the functions from parse_input.py
     # this defines the date and time of the observation, and is an Astropy Time object.
     obs_time = pi.date_and_time_setup("./inputs/date_and_time.json")

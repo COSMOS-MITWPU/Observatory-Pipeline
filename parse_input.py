@@ -74,9 +74,7 @@ def transit(observer, target):
     set_time = observer.target_set_time(
         obs_time, targets[-1], which="next", horizon=0 * u.deg
     )
-    transit_time = observer.astropy_time_to_datetime(
-        rise_time
-    ) - observer.astropy_time_to_datetime(set_time)
+    transit_time = set_time - rise_time
 
     return transit_time.to(units.hr)
     # or
