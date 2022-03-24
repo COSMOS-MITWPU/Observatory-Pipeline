@@ -4,7 +4,7 @@
 # to write all the pre requisite information like the observatory location, targets, constraints etc in
 # the inputs files given in the ./inputs folder json files. The parse_input files then parses it.
 # this file will take functions from parse_input and use its outputs here. 
- 
+
 # Important Libraries. 
 
 import numpy as np
