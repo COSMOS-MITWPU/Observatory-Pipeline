@@ -46,7 +46,7 @@
 | | | `cp -R` | Allows us to copy directories **case insensitive**
 | | | `cp -v` | Verbose can be used with many commands and it just prints informative messages (shows the status)
 |`exiftool`| Allows us to view all the details of an image in any format
-|`lsblk`| Shows you all the Disk partitions and their names on your disk
+|`lsblk`| Shows you all the Disk  partitions and their names on your disk
 
 **Note: We can use the '|' (pipe) to do multiple operations at once **
 **eg. search and sort - `grep aa file1.txt | sort`**
