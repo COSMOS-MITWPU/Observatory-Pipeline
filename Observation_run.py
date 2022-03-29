@@ -33,7 +33,7 @@ from astroplan import is_observable, is_always_observable, months_observable
 
 conf.auto_max_age = None
 
-input_file_path = "./new_inputs/input.json"
+input_file_path = "./inputs/input.json"
 
 # using UTI1
 download_IERS_A()
