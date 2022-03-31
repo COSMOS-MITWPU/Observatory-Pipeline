@@ -1,0 +1,68 @@
+{
+    "constraints": {
+        "airmass": 3,
+        "minimum_altitude": 15,
+        "maximum_altitude": 85,
+        "moon_separation": 10,
+        "define_start_time": false,
+        "start_time": {
+            "day": 20,
+            "month": 3,
+            "year": 2022,
+            "hours": 20,
+            "minutes": 30,
+            "seconds": 29
+        },
+        "define_end_time": false,
+        "end_time": {
+            "day": 20,
+            "month": 3,
+            "year": 2022,
+            "hours": 20,
+            "minutes": 30,
+            "seconds": 29
+        }
+    },
+    "date_and_time": {
+        "use_current_time": true,
+        "day": 20,
+        "month": 3,
+        "year": 2022,
+        "hours": 20,
+        "minutes": 30,
+        "seconds": 29
+    },
+    "observatory": {
+        "name": "MIT-Telescope",
+        "description": "GSO-Newtonian Telescope MIT World Peace University",
+        "latitude": 18.51773,
+        "longitude": 73.81488,
+        "elevation": 560,
+        "timezone": "Asia/Kolkata"
+    },
+    "targets": {
+        "targets": [
+            "vega",
+            "m31",
+            "jupiter",
+            "m1",
+            "m42",
+            "m55",
+            "saturn",
+            "sun",
+            "neptune",
+            "moon",
+            "venus",
+            "mars",
+            "orion",
+            "betelgeuse",
+            "rigel",
+            "Ariel",
+            "Capella",
+            "Deimos",
+            "Phobos",
+            "Ganymede",
+            "Enceladus"
+        ]
+    }
+}
