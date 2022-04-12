@@ -54,7 +54,54 @@ def if_observable(observer, target, constraints):
     )
     return ever_observable[0]  # return the first element of the list
 
+def observation_window(observer, target, constraints):
+    """
+    Returns: A string that has the observation window. 
+    Inputs: observer object, target object and constraints dictionary
 
+    It checks if the provided target is going to be observable in each minute of the time range
+    provided in the constraints as start_time and end_time. From there it finds the perfect time
+    where the object is going to be observable. 
+    """
+    start_time = constraints["start_time"]
+    end_time = constraints["end_time"]
+
+    # Find out the number of minutes between start time and end time
+    time_difference = end_time - start_time
+    number_of_minutes = int(time_difference.to_value("min"))
+    
+    # Making the Constraints list
+    constraints_list = [
+        AltitudeConstraint(
+            constraints["minimum_altitude"] * units.deg,
+            constraints["maximum_altitude"] * units.deg,
+        ),
+        AirmassConstraint(constraints["airmass"]),
+        AtNightConstraint.twilight_civil(),
+        MoonSeparationConstraint(min=constraints["moon_separation"] * units.deg),
+    ]
+    
+    
+    visibility_each_min=[]
+
+    for i in range(0, number_of_minutes, 5):
+        observable = is_always_observable(
+                constraints_list, observer, target, times=start_time + i * units.min
+            )
+        visibility_each_min.append([observable, (start_time + i * units.min).iso])
+
+    # Remove each False value
+    for i in visibility_each_min[:]:
+        if i[0] == False:
+            visibility_each_min.remove(i)
+        
+    # Make a final string and return it. 
+    try: 
+        window = visibility_each_min[0][1] + ' to ' + visibility_each_min[-1][1]
+    except IndexError as err:
+        window = "Not Observable"
+    return window
+    
 def transit(observer, target):
     """
     Arguments:
@@ -182,6 +229,7 @@ def targets_setup(file_path, observer, constraints, obs_time):
             "SET TIME",
             "TRANSIT (Hours)",
             "OBSERVABLE DURING TRANSIT?",
+            "OBSERVATION WINDOW"
         ]
     )
 
@@ -223,7 +271,8 @@ def targets_setup(file_path, observer, constraints, obs_time):
                 print("not found in solar database either. Skipping")
                 continue
         observable = if_observable(observer, initialized_target, constraints)
-
+        window = observation_window(observer, initialized_target, constraints)
+        
         # Adding a row to the database with calculated values.
         target_info_df.loc[i] = [
             target,  # Name
@@ -233,12 +282,13 @@ def targets_setup(file_path, observer, constraints, obs_time):
             set_time.iso,  # Set time
             transit_time,  # Transit
             observable,  # Whether or not the object is observable
+            window
         ]
 
     return target_info_df
 
 
-def constraints_setup(file_path):
+def constraints_setup(observer, obs_time,  file_path):
     # Returns the basic constraints that we need to check if a target is observable or not.
     # as a dictionary from the input constraints.json file.
 
@@ -254,7 +304,7 @@ def constraints_setup(file_path):
     data = data['constraints']
 
     # if start time isnt defined, then well use the evening twilight time as default.
-    if data["define_start_time"] is False:
+    if data["define_start_time"] == "true":
         data["start_time"] = json_to_astropy_time(data["start_time"])
     else:
         eve_twil_ioMIT = observer.twilight_evening_astronomical(
@@ -263,7 +313,7 @@ def constraints_setup(file_path):
         data["start_time"] = eve_twil_ioMIT
 
     # if end time isnt defined, then well use the next morning twilight time as default.
-    if data["define_end_time"] is False:
+    if data["define_end_time"] == "true":
         data["end_time"] = json_to_astropy_time(data["end_time"])
     else:
         morn_twil_ioMIT = observer.twilight_morning_astronomical(

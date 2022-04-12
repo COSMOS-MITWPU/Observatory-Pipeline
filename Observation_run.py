@@ -39,68 +39,9 @@ input_file_path = "./inputs/input.json"
 download_IERS_A()
 
 
-def time_in_india():
-    """
-    Arguements: None
-    Returns: The time in India Now
-    """
-    date = now + 5 * u.h + 30 * u.min
-    return date
-
-
-def target_is_up(observer, target, time_of_observation):
-    is_up = observer.target_is_up(time_of_observation, target)
-    return is_up
-
-
-def target_fix_icrs(longitude, latitude):  # International Celestial Reference System
-    coords = SkyCoord(longitude, latitude, frame="icrs")
-    return coords
-
-
-def altitude(observer, time_of_observation, target):
-    alt = observer.altaz(time_of_observation, target)
-    return alt.alt.degree
-
-
-def azimuth(observer, time_of_observation, target):
-    az = observer.altaz(time_of_observation, target)
-    return az.az.degree
-
-
-def moon():
-    return get_moon(now)
-
-
-def moon_illumination_today():
-    return moon_illumination(now)
-
-
 def airmass(observer, time_of_observation, target):
     target_altaz = observer.altaz(time_of_observation, target)
     return target_altaz.secz
-
-
-def observation_time_set(start, end, observer):
-    observation_time = start + (end - start) * np.linspace(0.0, 1.0, 20)
-    return observation_time
-
-
-def x_degree_horizon(observer, target, degree):
-    time = observer.target_rise_time(
-        now, target, which="next", horizon=degree * u.deg
-    ).iso
-    return time
-
-
-def rise_time(observer, target):
-    time = observer.target_rise_time(now, target).iso
-    return time
-
-
-def set_time(observer, target):
-    time = observer.target_set_time(now, target).iso
-    return time
 
 
 def observer_info(observer, obs_time):
@@ -141,7 +82,7 @@ def main():
     print("Observer Info File Saved!")
 
     # Constraints is a dictionary containing all the constraints defind in constraints.json
-    constraints = pi.constraints_setup(input_file_path)
+    constraints = pi.constraints_setup(observer, obs_time, input_file_path)
 
     # Create a dataframe that has information about the targets using input files.
     target_info_df = pi.targets_setup(input_file_path, observer, constraints, obs_time)
