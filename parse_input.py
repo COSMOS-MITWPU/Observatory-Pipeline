@@ -45,8 +45,8 @@ def if_observable(observer, target, constraints):
 
     t_range = Time(
         [
-            constraints["start_time"] - 0.5 * units.hour,
-            constraints["end_time"] + 0.5 * units.hour,
+            constraints["start_time"] - 0 * units.hour,
+            constraints["end_time"] + 0 * units.hour,
         ]
     )
     ever_observable = is_observable(
