@@ -1,3 +1,4 @@
+from doctest import master
 from astropy.io import fits
 import matplotlib.pyplot as plt
 import glob
@@ -51,3 +52,16 @@ def masterFlatFrame(flatFolder):
     return masterFlat
 # print(masterFlatFrame(flatFolder)) # Testing
 
+def processingData(sciList):
+    numSciFiles=len(sciList)
+    for i in range(numSciFiles):
+        rawHDU=fits.open(sciList[i])[0]
+        rawData=rawHDU.data
+        rawHeader=rawHDU.header
+        # Bias and flat correction
+        procData=rawData-masterBiasFrame(biasFolder)/masterFlatFrame(flatFolder)
+        procHDU=fits.PrimaryHDU(procData)
+        procHDU.header=rawHeader
+        procHDU.header.remove('BZERO')
+        procHDU.header.remove('BSCALE')
+        procHDU.writeto(procList[i]+'.proc.fits', overwrite=True)
