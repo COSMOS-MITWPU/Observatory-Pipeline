@@ -39,7 +39,7 @@ def masterBiasFrame(biasFolder):
 
 # print(masterBiasFrame(biasFolder)) # testing
 
-def flatFrame(flatFolder):
+def masterFlatFrame(flatFolder):
     flatList=glob.glob(os.path.join(flatFolder, '*fits'))
     numFlatFiles=len(flatList)
     flatImages = np.zeros((4108, 4096, numFlatFiles))
@@ -47,8 +47,7 @@ def flatFrame(flatFolder):
         #subtract the master bias and store the flat field image
         flatImages[:,:,i] = fits.open(flatList[i])[0].data - masterBiasFrame(biasFolder)
         flatImages[:,:,i] = flatImages[:,:,i] / np.median(flatImages[:,:,i])
-    return flatImages
-
-# print(flatFrame(flatFolder)) # Testing
-
+    masterFlat=np.mean(flatImages,axis=2)
+    return masterFlat
+# print(masterFlatFrame(flatFolder)) # Testing
 
