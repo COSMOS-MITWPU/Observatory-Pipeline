@@ -65,3 +65,27 @@ def processingData(sciList):
         procHDU.header.remove('BZERO')
         procHDU.header.remove('BSCALE')
         procHDU.writeto(procList[i]+'.proc.fits', overwrite=True)
+
+def cosmicCorrection(sciList):
+        detectorGain = 1.6 #in e-/ADU
+        readNoise = 14.0 #in electrons
+        saturLevel = 150000 #in electrons
+
+        numSciFiles=len(sciList)
+
+        for i in range(1,numSciFiles):
+            procHDU=fits.open(procList[i]+'.proc.fits')[0]
+            procData=procHDU.data
+            procHeader=procHDU.header
+
+            crmask,cleanArray=astroscrappy.detect_cosmics(procData,gain=detectorGain,readnoise=readNoise,satlevel=saturLevel)
+
+            procData_cr = cleanArray / detectorGain
+            crCleanHDU = fits.PrimaryHDU(procData_cr)
+            crCleanHDU.header = procHeader
+            crCleanHDU.writeto(procList[i] +'.proc.cr.fits', overwrite=True)
+        print("DONE !")
+
+# processingData(sciList)
+# cosmicCorrection(sciList)
+# The functions have to be run in this order 
