@@ -20,7 +20,7 @@
 #Modified by Kishalay De (kde@astro.caltech.edu) for removing dependency on deprecated pyfits
 #and making it compatible with astropy headers and python 3.6 (June 11, 2018)
 
-sexpath = ''  # if "sex" works in any directory, leave blank
+sexpath = '/usr/bin/'  # if "sex" works in any directory, leave blank
 
 defaulttolerance = 0.01  # these defaults should generally not be altered.
 defaultpatolerance = 1.4   
@@ -320,7 +320,7 @@ def sextract(sexfilename, nxpix, nypix, border=3, corner=12, minfwhm=1.5, maxfwh
 
     try:
        # Sextract the image !
-       os.system(sexpath+"sextractor " + sexfilename + " -c sex.config -SATUR_LEVEL "+str(sexsaturation))
+       os.system(sexpath+"source-extractor " + sexfilename + " -c sex.config -SATUR_LEVEL "+str(sexsaturation))
     except:
        print(' Error: Problem running sextractor')
        print(' Check that program is installed and runs at command line using ' + sexpath+'sex')
@@ -634,7 +634,7 @@ def distmatch(sexlist, catlist, maxrad=180, minrad=10, tolerance=0.010, reqmatch
     #Calculate all the distances
    
     #print 'Calculating distances...'
-    dtime0 = time.clock()
+    dtime0 = time.process_time()
  
     # In image catalog:
     sexdists = []
@@ -682,7 +682,7 @@ def distmatch(sexlist, catlist, maxrad=180, minrad=10, tolerance=0.010, reqmatch
 
     #print 'All done (in', time.clock()-dtime0, 's)'
     #print 'Finding matches...'
-    mtime0 = time.clock()
+    mtime0 = time.process_time()
 
     countgreatmatches = 0
 
