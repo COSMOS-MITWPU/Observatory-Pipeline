@@ -20,7 +20,7 @@
 #Modified by Kishalay De (kde@astro.caltech.edu) for removing dependency on deprecated pyfits
 #and making it compatible with astropy headers and python 3.6 (June 11, 2018)
 
-sexpath = '/usr/bin/'  # if "sex" works in any directory, leave blank
+sexpath = ''  # if "sex" works in any directory, leave blank
 
 defaulttolerance = 0.01  # these defaults should generally not be altered.
 defaultpatolerance = 1.4   

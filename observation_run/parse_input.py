@@ -5,7 +5,7 @@ import os
 from astropy.coordinates import EarthLocation
 from astroplan import Observer, FixedTarget
 from astropy.time import Time
-import astropy.units as units
+import astropy.units as unitssource-extractor
 import pandas as pd
 from datetime import datetime
 from astroplan import (

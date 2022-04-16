@@ -90,6 +90,7 @@ def astrometricCalibration(dataFolder,procFolder,sciList):
     autoastrometry_script=os.path.join(dataFolder, 'autoastrometry.py')
     os.chdir(procFolder)
     numSciFiles=len(sciList)
+    print('supposed to make a files here')
     for i in range(1, numSciFiles):
         try:
             filelist = procList[i]+'.proc.cr.fits'
