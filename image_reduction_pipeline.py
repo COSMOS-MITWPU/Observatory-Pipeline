@@ -100,28 +100,8 @@ def astrometricCalibration(dataFolder,procFolder,sciList):
             print('Could not run autoastrometry with error %s. Check if file exists.'%err)
     print("DONE !")
 
-def swarpConfig(dataFolder,sciList):
-    numSciFiles=len(sciList)
-    swarpConfigFile = os.path.join(dataFolder, 'stack.swarp')
-
-    #Make a text file listing the images to be stacked to feed into swarp
-    swarpFileList = os.path.join(procFolder, 'swarpFileList.txt')
-    f = open(swarpFileList, 'w')
-    for i in range(numSciFiles):
-        f.write(os.path.join(procFolder, 'a'+fileList[i]+'.proc.cr.fits\n'))
-    f.close()
-
-    try:
-        #IMAGEOUT_NAME is the output stackd file, WEIGHTOUT_NAME is the output weight file, RESAMPLE_DIR is the directory where the resampled images are to be stored
-        command = 'SWarp -c %s @%s -IMAGEOUT_NAME V641Cyg_g_stack.fits -WEIGHTOUT_NAME V641Cyg_g_stack.weight.fits -RESAMPLE_DIR %s' % (swarpConfigFile, swarpFileList, procFolder)
-        print("Executing command: %s" % command)
-        rval = subprocess.run(command.split(), check=True)
-    except subprocess.CalledProcessError as err:
-        print('Could not run swarp. Can you run it from the terminal?')
-    print(os.getcwd())
 
 processingData(sciList)
 cosmicCorrection(sciList)
 astrometricCalibration(dataFolder,procFolder,sciList)
-swarpConfig(dataFolder,sciList)
 # The functions have to be run in this order 
