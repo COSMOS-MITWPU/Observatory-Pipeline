@@ -1,3 +1,4 @@
+from audioop import bias
 from doctest import master
 from astropy.io import fits
 import matplotlib.pyplot as plt
@@ -17,15 +18,30 @@ flatFolder = os.path.join(dataFolder, 'flats')
 sciFolder = os.path.join(dataFolder, 'science') 
 procFolder = os.path.join(curpath, 'processing')
 
+
+# print(curpath)
+# print(dataFolder)
+# print(biasFolder)
+# print(flatFolder)
+# print(sciFolder)
+# print(procFolder)
+
 os.chdir(sciFolder)
 fileList = glob.glob('*.fits')
 os.chdir(curpath)
 procList = [os.path.join(procFolder, file) for file in fileList]
 sciList = [os.path.join(sciFolder, file) for file in fileList]
+
 numSciFiles=len(sciList)
 
+swarpFileList = os.path.join(procFolder, 'swarpFileList.txt')
+f = open(swarpFileList, 'w')
+for i in range(1,numSciFiles):
+    f.write(os.path.join(procFolder, 'a'+fileList[i]+'.proc.cr.fits\n'))
+f.close()
 
-def make_swarp_command(swarpFileList, swarpConfigFile, procFolder, how_do_you_call_swarp): 
+def make_swarp_command(swarpConfigFile, procFolder, how_do_you_call_swarp): 
+    swarpFileList = os.path.join(procFolder, 'swarpFileList.txt')
     new_file_names = []
     
     # extracting the list and making the command
@@ -44,23 +60,22 @@ def make_swarp_command(swarpFileList, swarpConfigFile, procFolder, how_do_you_ca
     return command
 
 def swarpConfig(dataFolder,sciList):
-    swarpFileList = os.path.join(procFolder, 'swarpFileList.txt')
-    swarpConfigFile = os.path.join(swarpFileList, dataFolder, 'stack.swarp')
+    swarpConfigFile = os.path.join(dataFolder, 'stack.swarp')
 
-    f = open(swarpFileList, 'w')
-    for i in range(numSciFiles):
-        f.write(os.path.join(procFolder, 'a'+fileList[i]+'.proc.cr.fits\n'))
-    f.close()
+    # f = open(swarpFileList, 'w')
+    # for i in range(numSciFiles):
+    #     f.write(os.path.join(procFolder, 'a'+fileList[i]+'.proc.cr.fits\n'))
+    # f.close()
     
     try:
         # Make a text file listing the images to be stacked to feed into swarp
-        command = make_swarp_command(swarpFileList, swarpConfigFile, procFolder, 'swarp')
+        command = make_swarp_command(swarpConfigFile, procFolder, 'SWarp')
         print("Executing command: %s" % command)
         print(command)
         subprocess.run(command, shell=True)
     except:
         print('trying another way to call SWarp')
-        command = make_swarp_command(swarpFileList, swarpConfigFile, procFolder, 'SWarp')
+        command = make_swarp_command(swarpConfigFile, procFolder, 'SWarp')
         print("Executing command: %s" % command)
         print(command)
         subprocess.run(command, shell=True)
