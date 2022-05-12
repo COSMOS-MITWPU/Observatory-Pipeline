@@ -1,5 +1,6 @@
 from distutils import filelist
 from genericpath import isfile
+from random import random
 import numpy as np
 import numpy.ma as ma
 import os
@@ -14,6 +15,8 @@ import glob
 import re
 from astropy.io import fits
 import matplotlib.pyplot as plt
+from astroquery.vizier import Vizier 
+from astropy.table import Table
 
 dir='/mnt/d/Obs_prep/Observatory-Documentation/data-sample/'
 dataList=[]
@@ -62,3 +65,11 @@ for i in range(len(raImageList)):
 
 boxsize=30
 maxmag=18
+
+Q = [Table.read('data-sample/ps1_v641cyg.tab')]
+
+
+ps1_imCoords = wcs_list[0].all_world2pix(Q[0]['RAJ2000'], Q[0]['DEJ2000'], 1)
+good_cat_stars = Q[0][np.where((ps1_imCoords[0] > 500) & (ps1_imCoords[0] < 3500) & (ps1_imCoords[1] > 500) & (ps1_imCoords[1] < 3500))]
+
+print(good_cat_stars)
