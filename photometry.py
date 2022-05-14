@@ -31,16 +31,6 @@ for file in allFiles:
     if file.endswith('.fits'):
         photometryFiles.append(f'{dir}{file}')
 
-photometryFiles.pop(1)
-for i in photometryFiles:   
-    print(i)
-
-# imageName=photometryFiles[0]
-# f=fits.open(imageName)
-
-# data=f[0].data
-# header=f[0].header
-
 
 for i in range (len(photometryFiles)):
     imageName=photometryFiles[i]
@@ -68,8 +58,30 @@ maxmag=18
 
 Q = [Table.read('data-sample/ps1_v641cyg.tab')]
 
+print(len(wcs_list))
+good_cat_stars=[]
 
-ps1_imCoords = wcs_list[0].all_world2pix(Q[0]['RAJ2000'], Q[0]['DEJ2000'], 1)
-good_cat_stars = Q[0][np.where((ps1_imCoords[0] > 500) & (ps1_imCoords[0] < 3500) & (ps1_imCoords[1] > 500) & (ps1_imCoords[1] < 3500))]
-
+for i in range(0,9):
+    try:
+        ps1_imCoords = wcs_list[i].all_world2pix(Q[0]['RAJ2000'], Q[0]['DEJ2000'], 1)
+        good_cat_stars.append(Q[0][np.where((ps1_imCoords[0] > 500) & (ps1_imCoords[0] < 3500) & (ps1_imCoords[1] > 500) & (ps1_imCoords[1] < 3500))])
+    except TypeError:
+        pass
 print(good_cat_stars)
+
+# Aperture Photometry
+
+os.chdir('/mnt/d/COSMOS/All_modules/photometry/data')
+
+configFile = 'photomCat.sex'
+paramName = 'photomCat.param'
+
+
+for i in range(len(photometryFiles)):
+    catalogName = photometryFiles[i]+'.cat'
+    try:
+        command = 'source-extractor -c %s %s -CATALOG_NAME %s -PARAMETERS_NAME %s' % (configFile, photometryFiles[i], catalogName, paramName)
+        print('Executing command: %s' % command)
+        rval = subprocess.run(command.split(), check=True)
+    except subprocess.CalledProcessError as err:
+        print('Could not run sextractor with exit error %s'%err)
