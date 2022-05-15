@@ -29,6 +29,9 @@ wcs_list=[]
 good_cat_stars=[]
 tblList=[]
 cleanSourcesList=[]
+idx_imageList=[]
+sourceCatCoordsList=[]
+ps1CatCoordsList=[]
 
 allFiles=[f for f in os.listdir('./data-sample/')]
 photometryFiles=[]
@@ -102,3 +105,11 @@ for i in range(len(tblList)):
     cleanSources = tblList[i][(tblList[0]['FLAGS']==0) & (tblList[i]['FWHM_WORLD'] < 2) & (tblList[i]['XWIN_IMAGE']<3500) & (tblList[i]['XWIN_IMAGE']>500) &(tblList[i]['YWIN_IMAGE']<3500) &(tblList[i]['YWIN_IMAGE']>500)]
     cleanSourcesList.append(cleanSources)
 print(cleanSourcesList)
+
+for i in range(len(good_cat_stars)):
+    sourceCatCoords = SkyCoord(ra=cleanSourcesList[i]['ALPHAWIN_J2000'], dec=cleanSourcesList[i]['DELTAWIN_J2000'], frame='icrs', unit='degree')
+    ps1CatCoords = SkyCoord(ra=good_cat_stars[i]['RAJ2000'], dec=good_cat_stars[i]['DEJ2000'], frame='icrs', unit='degree')
+
+    photoDistThresh = 0.6
+    idx_image, idx_ps1, d2d, d3d = ps1CatCoords.search_around_sky(sourceCatCoords, photoDistThresh*u.arcsec)
+    idx_imageList.append(idx_image)
