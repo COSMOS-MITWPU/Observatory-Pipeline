@@ -19,6 +19,12 @@ import matplotlib.pyplot as plt
 from astroquery.vizier import Vizier 
 from astropy.table import Table
 
+def get_table_from_ldac(filename, frame=1):
+    if frame>0:
+        frame = frame*2
+    tbl = Table.read(filename, hdu=frame)
+    return tbl
+
 
 dir='/home/karma8022/Photometry/data-sample/'
 imageName='/home/karma8022/Photometry/data-sample/aC0_20181013-174714-557.wcs.fits.proc.cr.fits'
@@ -92,6 +98,7 @@ def get_table_from_ldac(filename, frame=1):
     info for odd tables, giving it twce as many tables as a regular fits BinTableHDU,
     match the frame of a table to its corresponding frame in the ldac file).
     
+
     Parameters
     ----------
     filename: str
@@ -233,3 +240,87 @@ print(psf_exp)
 #         df = df.append(df2)
 #         print(df)
 #     return df
+
+    #Here, magDiff is a 2D array contaning the difference magnitudes for each source and aperture
+print(magDiff) 
+
+zeroPoints = []
+for i in range(len(aperture_diameter)):
+    #Array of differences between the catalog and instrumental magnitudes
+    offsets = ma.array(good_cat_stars['gmag'][idx_ps1] - cleanSources['MAG_APER'][:,i][idx_image])
+    #Compute sigma clipped statistics
+    zero_mean, zero_med, zero_std = sigma_clipped_stats(offsets)
+    zeroDict = {'diameter': aperture_diameter[i], 'zp_mean': zero_mean, 'zp_median': zero_med, 'zp_std': zero_std}
+    zeroPoints.append(zeroDict)
+    print(zeroDict) 
+
+
+
+magFile = photometryFiles[0] + '.apermag.txt'
+compMagList = ascii.read(magFile, format = 'no_header', data_start=4)
+
+radii = compMagList['col1']
+fluxSums = compMagList['col2']
+fluxArea = compMagList['col3']
+flux = compMagList['col4']
+mags = compMagList['col5']
+magErrs = compMagList['col6']
+
+
+for i in range(len(mags)):
+    magCorrected = mags[i] + zeroPoints[i]['zp_median'] - 25
+    #IRAF assumes a zero-point of 25 by default, so we've adjusted for that offset here
+    magCorrectedErr = np.sqrt(zeroPoints[i]['zp_std']**2 + magErrs[i]**2)
+    print('Corrected magnitude of %.2f +/- %.2f for a diameter of %.1f pixels'%(magCorrected, magCorrectedErr, zeroPoints[i]['diameter']))
+
+psfName = imageName + '.psf'
+psfcatalogName = imageName+'.psf.cat'
+psfparamName = 'photomPSF.param' #This is a new set of parameters to be obtained from SExtractor, including PSF-fit magnitudes
+try:
+    #We are supplying SExtactor with the PSF model with the PSF_NAME option
+    command = 'source-extractor -c %s %s -CATALOG_NAME %s -PSF_NAME %s -PARAMETERS_NAME %s' % (configFile, imageName, psfcatalogName, psfName, psfparamName)
+    print("Executing command: %s" % command)
+    rval = subprocess.run(command.split(), check=True)
+except subprocess.CalledProcessError as err:
+    print('Could not run sextractor with exit error %s'%err)
+
+print(rval)
+
+psfsourceTable = get_table_from_ldac(psfcatalogName)
+#Let's look at the contents of the table
+print(psfsourceTable.colnames)
+print(psfsourceTable)
+
+cleanPSFSources = psfsourceTable[(psfsourceTable['FLAGS']==0) & (psfsourceTable['FLAGS_MODEL']==0)  & (psfsourceTable['FWHM_WORLD'] < 2) & (psfsourceTable['XMODEL_IMAGE']<3500) & (psfsourceTable['XMODEL_IMAGE']>500) &(psfsourceTable['YMODEL_IMAGE']<3500) &(psfsourceTable['YMODEL_IMAGE']>500)]
+
+psfsourceCatCoords = SkyCoord(ra=cleanPSFSources['ALPHAWIN_J2000'], dec=cleanPSFSources['DELTAWIN_J2000'], frame='icrs', unit='degree')
+#Now cross match sources
+#Set the cross-match distance threshold to 0.6 arcsec, or just about one pixel
+photoDistThresh = 0.6
+idx_psfimage, idx_psfps1, d2d, d3d = ps1CatCoords.search_around_sky(psfsourceCatCoords, photoDistThresh*u.arcsec)
+
+print('Found %d good cross-matches'%len(idx_psfimage))
+
+psfoffsets = ma.array(good_cat_stars['gmag'][idx_psfps1] - cleanPSFSources['MAG_POINTSOURCE'][idx_psfimage])
+#Compute sigma clipped statistics
+zero_psfmean, zero_psfmed, zero_psfstd = sigma_clipped_stats(psfoffsets)
+print('PSF Mean ZP: %.2f\nPSF Median ZP: %.2f\nPSF STD ZP: %.2f'%(zero_psfmean, zero_psfmed, zero_psfstd))
+
+ra = 324.7915750
+dec = 46.7254686
+
+
+v641cyg_coords = SkyCoord(ra=[ra], dec=[dec], frame='icrs', unit='degree')
+idx_v641cyg, idx_cleanpsf_v641cyg, d2d, d3d = psfsourceCatCoords.search_around_sky(v641cyg_coords, photoDistThresh*u.arcsec)
+print('Found the source at index %d'%idx_cleanpsf_v641cyg[0])
+
+v641cyg_psfinstmag = cleanPSFSources[idx_cleanpsf_v641cyg]['MAG_POINTSOURCE'][0]
+v641cyg_psfinstmagerr = cleanPSFSources[idx_cleanpsf_v641cyg]['MAGERR_POINTSOURCE'][0]
+
+v641cyg_psfmag = zero_psfmed + v641cyg_psfinstmag
+v641cyg_psfmagerr = np.sqrt(v641cyg_psfinstmagerr**2 + zero_psfstd**2)
+
+print('PSF-fit magnitude of V641 Cyg is %.2f +/- %.2f'%(v641cyg_psfmag, v641cyg_psfmagerr))
+
+print("DONE")
+
