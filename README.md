@@ -15,7 +15,7 @@
 	- ASI462MC (Color)
 
 ## Python Pipline
-1) **Observation Run Preparation**
+1) **Observation Run Preparation** <br/>
 	When scheduling an observation session , it is of paramount importance to keep track of the objects of interest for the said observation and the availabilty of those celestial objects . An Observation Run Preparation software plays the part of conveying when the objects are visible and if they meet the standards needed to extract scientific data out of them
 
 
