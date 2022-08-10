@@ -1,12 +1,3 @@
-# File to produce an output Excel sheet with Observation information of the given targets.
-
-# The way this is going to work is that the user that wants to conduct observations, needs
-# to write all the pre requisite information like the observatory location, targets, constraints etc in
-# the inputs files given in the ./inputs folder json files. The parse_input files then parses it.
-# this file will take functions from parse_input and use its outputs here.
-
-# Important Libraries.
-
 import numpy as np
 import pytz
 import matplotlib.pyplot as plt
